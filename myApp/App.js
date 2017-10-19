@@ -10,28 +10,45 @@ export default class App extends React.Component {
     super(props)
     this.state = {
       animated:new Animated.Value(0),
-      opacityA: new Animated.Value(1)
+      opacityA: new Animated.Value(1),
+      animated2:new Animated.Value(0),
+      opacityB: new Animated.Value(1),
+      colorStateButton:'rgb(69, 237, 18)'
     }
   }
   componentDidMount() {
-    const {animated,opacityA} = this.state
-    Animated.loop(
-      Animated.parallel([
-        Animated.timing(animated,{
-          toValue:1,
-          duration:5000
-        }),
-        Animated.timing(opacityA,{
-          toValue:0,
-          duration:5000
-        })
-      ])
-    ).start()
+    const {animated,opacityA,animated2,opacityB} = this.state
+    Animated.stagger(500,[
+      Animated.loop(
+        Animated.parallel([
+          Animated.timing(animated,{
+            toValue:1,
+            duration:5000
+          }),
+          Animated.timing(opacityA,{
+            toValue:0,
+            duration:5000
+          })
+        ])
+      ),
+      Animated.loop(
+        Animated.parallel([
+          Animated.timing(animated2,{
+            toValue:1,
+            duration:5000
+          }),
+          Animated.timing(opacityB,{
+            toValue:0,
+            duration:5000
+          })
+        ])
+      )
+    ]).start()
   }
   render() {
     const width = Dimensions.get('window').width
     const height =Dimensions.get('window').height
-    const {animated,opacityA} = this.state
+    const {animated,opacityA,animated2,opacityB,colorStateButton} = this.state
     return (
       <View style={styles.container}>
         <LinearGradient style={{
@@ -65,25 +82,39 @@ export default class App extends React.Component {
 
 
           <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-            <View style={{height:width/5*4,width:width/5*4,backgroundColor:'rgba(0,0,0,0)',borderWidth:1,borderColor:'rgba(0,0,0,0.05)',
-              borderRadius:width/5*4/2,alignItems:'center',justifyContent:'center'
+            <View style={{height:width/5*4-10,width:width/5*4-10,backgroundColor:'rgba(0,0,0,0)',borderWidth:1,borderColor:'rgba(0,0,0,0.05)',
+              borderRadius:width/5*4-10/2,alignItems:'center',justifyContent:'center'
             }}>
-              <Animated.View style={{height:width/5*4-40,width:width/5*4-40,backgroundColor:'red',borderWidth:1,borderColor:'rgba(0,0,0,0.08)',
-                borderRadius:(width/5*4-40)/2,alignItems:'center',justifyContent:'center'
-                ,opacity:opacityA,transform:[
-                  {
-                    scale:animated
-                  }
-                ]
+              <View style={{height:width/5*4-30,width:width/5*4-30,backgroundColor:'rgba(255,255,255,0.5)',borderWidth:1,borderColor:'rgba(0,0,0,0.05)',
+                borderRadius:width/5*4-30/2,alignItems:'center',justifyContent:'center'
               }}>
-                <LinearGradient  colors={['#EC6F66','#F3A183']} style={{justifyContent:'center',alignItems:'center',height:width/5*4-40,width:width/5*4-40,borderRadius:(width/5*4-40)/2}}>
-                  <View style={{width:width/5*4 - 80,height:width/5*4 - 80
-                      ,borderRadius:width/5*4-80/2,backgroundColor:'white'
+                <Animated.View style={{height:width/5*4-40,width:width/5*4-40,backgroundColor:colorStateButton,borderWidth:1,borderColor:'rgba(0,0,0,0.08)',
+                  borderRadius:(width/5*4-40)/2,alignItems:'center',justifyContent:'center'
+                  ,opacity:opacityA,transform:[
+                    {
+                      scale:animated
+                    }
+                  ]
+                }}>
+                  <Animated.View style={{height:width/5*4-40,width:width/5*4-40,backgroundColor:'rgba(0,255,0,0.4)',borderWidth:1,borderColor:'rgba(0,0,0,0.08)',
+                    borderRadius:(width/5*4-40)/2,alignItems:'center',justifyContent:'center'
+                    ,opacity:opacityB,transform:[
+                      {
+                        scale:animated2
+                      }
+                    ]
+                  }}/>
+                </Animated.View>
+                <View style={{position:'absolute',alignItems:'center',justifyContent:'center',width:width/5*4 - 105,height:width/5*4 - 105,borderRadius:width/5*4 - 105/2,
+                  backgroundColor:'rgba(0,0,0,0.05)'}}>
+                  <LinearGradient colors={['#fdfbfb','#ebedee']} style={{width:width/5*4 - 110,height:width/5*4 - 110
+                      ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
                   }}>
+                    <Text style={{fontSize:40,backgroundColor:'transparent',color:'rgb(69, 237, 18)'}}>ON</Text>
+                  </LinearGradient>
+                </View>
+              </View>
 
-                  </View>
-                </LinearGradient>
-              </Animated.View>
             </View>
           </View>
         </LinearGradient>

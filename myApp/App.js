@@ -1,11 +1,41 @@
 import React from 'react';
 import { StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image } from 'react-native';
 import {LinearGradient,Constants} from 'expo'
-import {StackNavigator} from 'react-navigation'
+import {StackNavigator,DrawerNavigator} from 'react-navigation'
+class MyNotificationsScreen extends React.Component {
+  static navigationOptions = {
+    drawerLabel: 'Notifications',
+    drawerIcon: ({ tintColor }) => (
+      <Image
+        source={require('./icon/drawer.png')}
+        style={{height:24,width:24}}
+      />
+    ),
+  };
 
-export default class App extends React.Component {
-  _onPressChooseDevice() {
-    alert('click')
+  render() {
+    return (
+      <View>
+      <Button
+        onPress={() => this.props.navigation.goBack()}
+        title="Go back home"
+      />
+    </View>
+    );
+  }
+}
+
+class MainScreen extends React.Component {
+  static navigationOptions = {
+    drawerLabel: 'MainScreen',
+    drawerIcon: ({ tintColor }) => (
+      <Image
+        source={require('./icon/drawer.png')}
+        style={{height:24,width:24}}
+      />
+    ),
+  };
+  _onPressDevice() {
   }
   constructor(props){
     super(props)
@@ -109,10 +139,12 @@ export default class App extends React.Component {
             <View style={styles.statusBar} />
             <View style={{flexDirection:'row',padding:10,justifyContent:'center'}}>
               <View style={{justifyContent:'center'}}>
-                <Image style={{height:20,width:20}} resizeMode='cover' source={require('./icon/drawer.png')}/>
+                <TouchableHighlight onPress = {() => {this.props.navigation.navigate('DrawerToggle')}}>
+                  <Image style={{height:20,width:20}} resizeMode='cover' source={require('./icon/drawer.png')}/>
+                </TouchableHighlight>
               </View>
               <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
-                <TouchableHighlight style={{height:null,width:null}} onPress={this._onPressChooseDevice.bind(this)}>
+                <TouchableHighlight style={{height:null,width:null}} onPress={this._onPressDevice.bind(this)}>
                   <View style={{flex:1,justifyContent:'center',alignItems:'center',flexDirection:'row'}}>
                     <View style={{justifyContent:'center',alignItems:'center'}}>
                       <Text style={{fontSize:15,fontWeight:'bold',backgroundColor:'transparent'}}>KitChen</Text>
@@ -177,13 +209,27 @@ export default class App extends React.Component {
               keyExtractor= {(x,i) => i}
               renderItem={({index,item})=>this._renderItem(index,item)}
               />
+            <View style={{marginBottom:30,height:50,width,backgroundColor:'rgba(255,255,255,0.3)'}}>
+
             </View>
+          </View>
         </LinearGradient>
       </View>
     );
   }
 }
+export default App = DrawerNavigator({
+  MainScreen:{screen:MainScreen},
+  Notifications: {
+    screen: MyNotificationsScreen,
+  },
+},
+{
+  initialRouteName:'MainScreen',
+  drawerPosition:'left'
+}
 
+)
 const styles = StyleSheet.create({
   viewUnderLinear: {
     flex:1,

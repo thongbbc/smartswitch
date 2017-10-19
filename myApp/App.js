@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text,TouchableHighlight,Animated, View,Dimensions,Image } from 'react-native';
+import { StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image } from 'react-native';
 import {LinearGradient,Constants} from 'expo'
+import {StackNavigator} from 'react-navigation'
 
 export default class App extends React.Component {
   _onPressChooseDevice() {
@@ -13,12 +14,47 @@ export default class App extends React.Component {
       opacityA: new Animated.Value(1),
       animated2:new Animated.Value(0),
       opacityB: new Animated.Value(1),
-      colorStateButton:'rgb(69, 237, 18)'
+      colorStateButton:'rgb(69, 237, 18)',
+      stateButton:true,
+      dataSource:[
+        {name:'thong',check:'white'},
+        {name:'thong',check:'transparent'},
+        {name:'thon',check:'transparent'}
+      ],
     }
+  }
+  _onPressChooseDevice(index) {
+    dulieu = []
+    const {dataSource} = this.state
+    dataSource.map((value,index2) =>{
+      if (index2 == index ){
+        value.check='white'
+        dulieu.push(value)
+      } else {
+        value.check='transparent'
+        dulieu.push(value)
+      }
+    })
+    this.setState({dataSource:dulieu})
+  }
+  _renderItem(index,item) {
+    const height =Dimensions.get('window').height
+    const width = Dimensions.get('window').width
+    return(
+      <View>
+        <TouchableHighlight onPress={this._onPressChooseDevice.bind(this,index)}>
+          <View style={{height:height/9 - 5,backgroundColor:item.check
+            ,justifyContent:'center',alignItems:'center',borderRadius:5
+            ,width:width/5,padding:10}}>
+            <Text style={{fontSize:8,backgroundColor:'transparent'}}>{item.name}</Text>
+          </View>
+        </TouchableHighlight>
+      </View>
+    )
   }
   componentDidMount() {
     const {animated,opacityA,animated2,opacityB} = this.state
-    Animated.stagger(500,[
+    Animated.stagger(1000,[
       Animated.loop(
         Animated.parallel([
           Animated.timing(animated,{
@@ -35,20 +71,34 @@ export default class App extends React.Component {
         Animated.parallel([
           Animated.timing(animated2,{
             toValue:1,
-            duration:5000
+            duration:4000
           }),
           Animated.timing(opacityB,{
             toValue:0,
-            duration:5000
+            duration:4000
           })
         ])
       )
     ]).start()
   }
+  _onPressClickItem() {
+    this.setState({
+      stateButton:!this.state.stateButton
+    })
+    if (this.state.stateButton== true) {
+      this.setState({
+        colorStateButton:'rgb(69, 237, 18)'
+      })
+    } else {
+      this.setState({
+        colorStateButton:'red'
+      })
+    }
+  }
   render() {
     const width = Dimensions.get('window').width
     const height =Dimensions.get('window').height
-    const {animated,opacityA,animated2,opacityB,colorStateButton} = this.state
+    const {dataSource,animated,opacityA,animated2,opacityB,colorStateButton,stateButton} = this.state
     return (
       <View style={styles.container}>
         <LinearGradient style={{
@@ -81,23 +131,23 @@ export default class App extends React.Component {
           </View>
 
 
-          <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+          <View style={{marginBottom:70,marginTop:50,flex:1,justifyContent:'center',alignItems:'center'}}>
             <View style={{height:width/5*4-10,width:width/5*4-10,backgroundColor:'rgba(0,0,0,0)',borderWidth:1,borderColor:'rgba(0,0,0,0.05)',
               borderRadius:width/5*4-10/2,alignItems:'center',justifyContent:'center'
             }}>
-              <View style={{height:width/5*4-30,width:width/5*4-30,backgroundColor:'rgba(255,255,255,0.5)',borderWidth:1,borderColor:'rgba(0,0,0,0.05)',
-                borderRadius:width/5*4-30/2,alignItems:'center',justifyContent:'center'
+              <View style={{height:width/5*4-50,width:width/5*4-50,backgroundColor:'rgba(255,255,255,0.5)',borderWidth:1,borderColor:'rgba(0,0,0,0.05)',
+                borderRadius:width/5*4-50/2,alignItems:'center',justifyContent:'center'
               }}>
-                <Animated.View style={{height:width/5*4-40,width:width/5*4-40,backgroundColor:colorStateButton,borderWidth:1,borderColor:'rgba(0,0,0,0.08)',
-                  borderRadius:(width/5*4-40)/2,alignItems:'center',justifyContent:'center'
+                <Animated.View style={{height:width/5*4-50,width:width/5*4-50,backgroundColor:colorStateButton,borderWidth:1,borderColor:'rgba(0,0,0,0.08)',
+                  borderRadius:(width/5*4-50)/2,alignItems:'center',justifyContent:'center'
                   ,opacity:opacityA,transform:[
                     {
                       scale:animated
                     }
                   ]
                 }}>
-                  <Animated.View style={{height:width/5*4-40,width:width/5*4-40,backgroundColor:'rgba(0,255,0,0.4)',borderWidth:1,borderColor:'rgba(0,0,0,0.08)',
-                    borderRadius:(width/5*4-40)/2,alignItems:'center',justifyContent:'center'
+                  <Animated.View style={{height:width/5*4-50,width:width/5*4-50,backgroundColor:'rgba(0,255,0,0.4)',borderWidth:1,borderColor:'rgba(0,0,0,0.08)',
+                    borderRadius:(width/5*4-50)/2,alignItems:'center',justifyContent:'center'
                     ,opacity:opacityB,transform:[
                       {
                         scale:animated2
@@ -107,16 +157,27 @@ export default class App extends React.Component {
                 </Animated.View>
                 <View style={{position:'absolute',alignItems:'center',justifyContent:'center',width:width/5*4 - 105,height:width/5*4 - 105,borderRadius:width/5*4 - 105/2,
                   backgroundColor:'rgba(0,0,0,0.05)'}}>
-                  <LinearGradient colors={['#fdfbfb','#ebedee']} style={{width:width/5*4 - 110,height:width/5*4 - 110
-                      ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
-                  }}>
-                    <Text style={{fontSize:40,backgroundColor:'transparent',color:'rgb(69, 237, 18)'}}>ON</Text>
-                  </LinearGradient>
+                  <TouchableHighlight style={{borderRadius:width/5*4-110/2,height:null,width:null}} onPress={this._onPressClickItem.bind(this)}>
+                    <View style={{borderRadius:width/5*4-110/2}}>
+                      <LinearGradient colors={['#fdfbfb','#ebedee']} style={{width:width/5*4 - 110,height:width/5*4 - 110
+                          ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
+                      }}>
+                        <Text style={{fontSize:40,backgroundColor:'transparent',color:colorStateButton}}>ON</Text>
+                      </LinearGradient>
+                    </View>
+                  </TouchableHighlight>
                 </View>
               </View>
-
             </View>
           </View>
+          <View style={{flex:1}}>
+            <FlatList
+              horizontal
+              data={dataSource}
+              keyExtractor= {(x,i) => i}
+              renderItem={({index,item})=>this._renderItem(index,item)}
+              />
+            </View>
         </LinearGradient>
       </View>
     );

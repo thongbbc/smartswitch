@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image } from 'react-native';
-import {LinearGradient,Constants} from 'expo'
+import LinearGradient from 'react-native-linear-gradient';
 import {StackNavigator,DrawerNavigator} from 'react-navigation'
 class MyNotificationsScreen extends React.Component {
   static navigationOptions = {
@@ -132,6 +132,7 @@ class MainScreen extends React.Component {
     return (
       <View style={styles.container}>
         <LinearGradient style={{
+            borderColor:'white',
             width:Dimensions.get('window').width,
             height:Dimensions.get('window').height}} colors={['#f5f7fa','#c3cfe2']}
             >
@@ -191,10 +192,14 @@ class MainScreen extends React.Component {
                   backgroundColor:'rgba(0,0,0,0.05)'}}>
                   <TouchableHighlight style={{borderRadius:width/5*4-110/2,height:null,width:null}} onPress={this._onPressClickItem.bind(this)}>
                     <View style={{borderRadius:width/5*4-110/2}}>
-                      <LinearGradient colors={['#fdfbfb','#ebedee']} style={{width:width/5*4 - 110,height:width/5*4 - 110
+                      <LinearGradient colors={['#fdfbfb','#ebedee']} style={{borderColor:'white',width:width/5*4 - 110,height:width/5*4 - 110
+                          ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
+                      }}>
+                      <View style={{backgroundColor:'white',width:width/5*4 - 110,height:width/5*4 - 110
                           ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
                       }}>
                         <Text style={{fontSize:40,backgroundColor:'transparent',color:colorStateButton}}>ON</Text>
+                      </View>
                       </LinearGradient>
                     </View>
                   </TouchableHighlight>
@@ -243,6 +248,6 @@ const styles = StyleSheet.create({
   },
   statusBar: {
     backgroundColor: "transparent",
-    height: Constants.statusBarHeight,
+    height: 40,
   }
 });

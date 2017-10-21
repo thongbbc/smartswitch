@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image } from 'react-native';
+import {TextInput,Button,Modal, StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {StackNavigator,DrawerNavigator} from 'react-navigation'
 import { Client, Message } from 'react-native-paho-mqtt';
@@ -51,6 +51,11 @@ client.connect()
     }
   })
 ;
+
+
+
+
+
 class MyNotificationsScreen extends React.Component {
   static navigationOptions = {
     drawerLabel: 'Notifications',
@@ -100,6 +105,9 @@ class MainScreen extends React.Component {
         {name:'thong',check:'transparent'},
         {name:'thon',check:'transparent'}
       ],
+      modalVisible:false,
+      ssid:'',
+      passwifi:''
     }
   }
   _onPressChooseDevice(index) {
@@ -173,38 +181,108 @@ class MainScreen extends React.Component {
         colorStateButton:'red'
       })
     }
-
-    Smartconfig.start({
-      type: 'esptouch', //or airkiss, now doesn't not effect
-      ssid: 'BLACK',
-      bssid: 'filter-device', //"" if not need to filter (don't use null)
-      password: 'yoursolution',
-      timeout: 50000 //now doesn't not effect
-    }).then(function(results){
-      //Array of device success do smartconfig
-      console.log(results);
-      alert(JSON.stringify(results))
-      /*[
-        {
-          'bssid': 'device-bssi1', //device bssid
-          'ipv4': '192.168.1.11' //local ip address
-        },
-        {
-          'bssid': 'device-bssi2', //device bssid
-          'ipv4': '192.168.1.12' //local ip address
-        },
-        ...
-      ]*/
-    }).catch(function(error) {
-
-    });
-
-
-
-
-
-
-
+  }
+  _renderConfigScreen() {
+    const width = Dimensions.get('window').width
+    const height =Dimensions.get('window').height
+    return (
+      <View style = {{flex:1,position:'absolute'}}>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {alert("Modal has been closed.")}}>
+          <View style={{
+              flex:1,backgroundColor:'rgba(0,0,0,0.3)',alignItems:'center',
+            justifyContent:'center'}}>
+            <View style={{padding:10,borderRadius:5,borderWidth:1,
+                borderColor:'rgba(0,0,0,0.5)',
+                height:height/2+height/10,width:width/2+width/5,
+                backgroundColor:'white'}}>
+              <Text style={{backgroundColor:'green',width:width/2+width/5-20,
+              textAlign:'center',padding:5,
+              fontWeight:'800',fontSize:20,color:'white'}}>Setting</Text>
+              <View style={{marginBottom:20,width:width/2+width/5-20
+                ,marginTop:20,flex:1,alignItems:'center'}}>
+                <Image style={{flex:1}} resizeMode='contain' source={require('./icon/setting.png')}/>
+              </View>
+              <TextInput
+                placeholder="SSID"
+                style={{padding:10,height: 40,marginBottom:10, borderColor: 'gray',
+                borderWidth: 1,borderColor: 'rgba(0,0,0,0.3)',borderRadius:5}}
+                onChangeText={(text) => this.setState({ssid:text})}
+                value={this.state.ssid}
+              />
+              <TextInput
+                placeholder="PASSWORD"
+                style={{borderRadius:5,padding:10,height: 40,
+                borderColor: 'rgba(0,0,0,0.3)', borderWidth: 1}}
+                onChangeText={(text) => this.setState({passwifi:text})}
+                value={this.state.passwifi}
+              />
+            <View style={{marginTop:10,width:width/2 + width/5 - 20,
+              flexDirection:'row'}}>
+                <TouchableHighlight onPress={this._onPressConfig.bind(this)}>
+                  <View style={{backgroundColor:'white',
+                    width:(width/2 + width/5)/2-10,height:35,padding:5}}>
+                    <Text style={{color:'#1169f7',textAlign:'center',flex:1}}>ACCEPT</Text>
+                  </View>
+                </TouchableHighlight>
+                <TouchableHighlight onPress={this._onPressCancelConfig.bind(this)}>
+                  <View style={{backgroundColor:'white',
+                    width:(width/2 + width/5)/2-10,height:35,padding:5}}>
+                    <Text style={{color:'red',textAlign:'center',flex:1}}>CANCEL</Text>
+                  </View>
+                </TouchableHighlight>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    )
+  }
+  _onPressShowConfig() {
+    this.setState({
+      modalVisible:true
+    })
+  }
+  _onPressConfig() {
+    const {ssid,password} = this.state
+    if (ssid != '' && password !='') {
+      Smartconfig.start({
+        type: 'esptouch', //or airkiss, now doesn't not effect
+        ssid: ssid,
+        bssid: 'filter-device', //"" if not need to filter (don't use null)
+        password: password,
+        timeout: 50000 //now doesn't not effect
+      }).then(function(results){
+        //Array of device success do smartconfig
+        console.log(results);
+        alert(JSON.stringify(results))
+        /*[
+          {
+            'bssid': 'device-bssi1', //device bssid
+            'ipv4': '192.168.1.11' //local ip address
+          },
+          {
+            'bssid': 'device-bssi2', //device bssid
+            'ipv4': '192.168.1.12' //local ip address
+          },
+          ...
+        ]*/
+      }).catch(function(error) {
+        alert('CANNOT CONFIG THIS DEVICE')
+      });
+    } else {
+        alert('PLEASE CHECK YOUR SSID OR PASSWORD!')
+    }
+  }
+  _onPressCancelConfig() {
+    this.setState({
+      modalVisible:false,
+      ssid:'',
+      password:''
+    })
   }
   render() {
     const width = Dimensions.get('window').width
@@ -237,9 +315,11 @@ class MainScreen extends React.Component {
                 </TouchableHighlight>
               </View>
               <View style={{justifyContent:'center',alignItems:'flex-end'}}>
-                <View style={{shadowRadius: 10,shadowOpacity: 0.15,backgroundColor:'white',borderRadius:5,height:20,width:20,justifyContent:'center',alignItems:'center'}}>
+                <TouchableHighlight onPress={this._onPressShowConfig.bind(this)}>
+                <View  style={{shadowRadius: 10,shadowOpacity: 0.15,backgroundColor:'white',borderRadius:5,height:20,width:20,justifyContent:'center',alignItems:'center'}}>
                   <Image style={{height:10,width:10}} resizeMode='cover' source={require('./icon/plus.png')}/>
                 </View>
+                </TouchableHighlight>
               </View>
             </View>
           </View>
@@ -295,11 +375,15 @@ class MainScreen extends React.Component {
               keyExtractor= {(x,i) => i}
               renderItem={({index,item})=>this._renderItem(index,item)}
               />
-            <View style={{marginBottom:30,height:50,width,backgroundColor:'rgba(255,255,255,0.3)'}}>
+            <View style={{
+                marginBottom:30,height:50,width,backgroundColor:'rgba(255,255,255,0.3)'
+              }}>
 
             </View>
           </View>
         </LinearGradient>
+
+        {this._renderConfigScreen()}
       </View>
     );
   }

@@ -1,5 +1,5 @@
 import React from 'react';
-import {TextInput,Button,Modal, StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image } from 'react-native';
+import {AsyncStorage,TextInput,Button,Modal, StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {StackNavigator,DrawerNavigator} from 'react-navigation'
 import { Client, Message } from 'react-native-paho-mqtt';
@@ -89,8 +89,6 @@ class MainScreen extends React.Component {
       />
     ),
   };
-  _onPressDevice() {
-  }
   constructor(props){
     super(props)
     this.state = {
@@ -107,7 +105,44 @@ class MainScreen extends React.Component {
       ],
       modalVisible:false,
       ssid:'',
-      passwifi:''
+      passwifi:'',
+      nameDevice:'',
+      listDevice:[{macid:'123',nameDevice:'KitChen'},
+                  {macid:'123',nameDevice:'BedRoom'},
+                  {macid:'123',nameDevice:'Toilet'}
+      ],
+      selectedDevice:'NULL',
+      modalVisible2:false
+    }
+    this._getDataWhenStartApp()
+  }
+  async _getDataWhenStartApp() {
+    try {
+      const value = await AsyncStorage.getItem('devices');
+      if (value !== null){
+        const convertedJson = JSON.parse(value)
+        console.log(JSON.stringify(convertedJson))
+        this.setState({
+          listDevice:convertedJson,
+          selectedDevice:convertedJson[0].nameDevice
+        })
+      }
+    } catch (error) {
+      alert("STORAGE ERROR")
+    }
+  }
+  async _getDataListDeviceParent() {
+    try {
+      const value = await AsyncStorage.getItem('devices');
+      if (value !== null){
+        const convertedJson = JSON.parse(value)
+        console.log(JSON.stringify(convertedJson))
+        this.setState({
+          listDevice:convertedJson
+        })
+      }
+    } catch (error) {
+      alert("STORAGE ERROR")
     }
   }
   _onPressChooseDevice(index) {
@@ -192,51 +227,64 @@ class MainScreen extends React.Component {
           transparent={true}
           visible={this.state.modalVisible}
           onRequestClose={() => {alert("Modal has been closed.")}}>
-          <View style={{
+          <TouchableHighlight underlayColor='transparent'
+            onPress={this._onPressCancelConfig.bind(this)} style={{flex:1}}>
+            <View style={{
               flex:1,backgroundColor:'rgba(0,0,0,0.3)',alignItems:'center',
             justifyContent:'center'}}>
-            <View style={{padding:10,borderRadius:5,borderWidth:1,
-                borderColor:'rgba(0,0,0,0.5)',
-                height:height/2+height/10,width:width/2+width/5,
-                backgroundColor:'white'}}>
-              <Text style={{backgroundColor:'green',width:width/2+width/5-20,
-              textAlign:'center',padding:5,
-              fontWeight:'800',fontSize:20,color:'white'}}>Setting</Text>
-              <View style={{marginBottom:20,width:width/2+width/5-20
-                ,marginTop:20,flex:1,alignItems:'center'}}>
-                <Image style={{flex:1}} resizeMode='contain' source={require('./icon/setting.png')}/>
+              <TouchableHighlight underlayColor='rgba(0,0,0,0)'>
+              <View style={{padding:10,borderRadius:5,borderWidth:1,
+                  borderColor:'rgba(0,0,0,0.5)',
+                  height:height/2+height/10,width:width/2+width/5,
+                  backgroundColor:'white'}}>
+                <Text style={{backgroundColor:'green',width:width/2+width/5-20,
+                textAlign:'center',padding:5,
+                fontWeight:'800',fontSize:20,color:'white'}}>Setting</Text>
+                <View style={{marginBottom:20,width:width/2+width/5-20
+                  ,marginTop:20,flex:1,alignItems:'center'}}>
+                  <Image style={{flex:1}} resizeMode='contain' source={require('./icon/setting.png')}/>
+                </View>
+                <TextInput
+                  placeholder="SSID"
+                  style={{padding:10,height: 40,marginBottom:5, borderColor: 'gray',
+                  borderWidth: 1,borderColor: 'rgba(0,0,0,0.3)',borderRadius:5}}
+                  onChangeText={(text) => this.setState({ssid:text})}
+                  value={this.state.ssid}
+                />
+                <TextInput
+                  placeholder="PASSWORD WIFI"
+                  style={{borderRadius:5,padding:10,height: 40,marginBottom:5,
+                  borderColor: 'rgba(0,0,0,0.3)', borderWidth: 1}}
+                  onChangeText={(text) => this.setState({passwifi:text})}
+                  value={this.state.passwifi}
+                />
+                <TextInput
+                  placeholder="NAME DEVICE"
+                  style={{borderRadius:5,padding:10,height: 40,
+                  borderColor: 'rgba(0,0,0,0.3)', borderWidth: 1}}
+                  onChangeText={(text) => this.setState({nameDevice:text})}
+                  value={this.state.nameDevice}
+                />
+              <View style={{marginTop:10,width:width/2 + width/5 - 20,
+                flexDirection:'row'}}>
+                  <TouchableHighlight
+                    onPress={this._onPressConfig.bind(this)}>
+                    <View style={{backgroundColor:'white',
+                      width:(width/2 + width/5)/2-10,height:35,padding:5}}>
+                      <Text style={{color:'#1169f7',textAlign:'center',flex:1}}>ACCEPT</Text>
+                    </View>
+                  </TouchableHighlight>
+                  <TouchableHighlight onPress={this._onPressCancelConfig.bind(this)}>
+                    <View style={{backgroundColor:'white',
+                      width:(width/2 + width/5)/2-10,height:35,padding:5}}>
+                      <Text style={{color:'red',textAlign:'center',flex:1}}>CANCEL</Text>
+                    </View>
+                  </TouchableHighlight>
+                </View>
               </View>
-              <TextInput
-                placeholder="SSID"
-                style={{padding:10,height: 40,marginBottom:10, borderColor: 'gray',
-                borderWidth: 1,borderColor: 'rgba(0,0,0,0.3)',borderRadius:5}}
-                onChangeText={(text) => this.setState({ssid:text})}
-                value={this.state.ssid}
-              />
-              <TextInput
-                placeholder="PASSWORD"
-                style={{borderRadius:5,padding:10,height: 40,
-                borderColor: 'rgba(0,0,0,0.3)', borderWidth: 1}}
-                onChangeText={(text) => this.setState({passwifi:text})}
-                value={this.state.passwifi}
-              />
-            <View style={{marginTop:10,width:width/2 + width/5 - 20,
-              flexDirection:'row'}}>
-                <TouchableHighlight onPress={this._onPressConfig.bind(this)}>
-                  <View style={{backgroundColor:'white',
-                    width:(width/2 + width/5)/2-10,height:35,padding:5}}>
-                    <Text style={{color:'#1169f7',textAlign:'center',flex:1}}>ACCEPT</Text>
-                  </View>
-                </TouchableHighlight>
-                <TouchableHighlight onPress={this._onPressCancelConfig.bind(this)}>
-                  <View style={{backgroundColor:'white',
-                    width:(width/2 + width/5)/2-10,height:35,padding:5}}>
-                    <Text style={{color:'red',textAlign:'center',flex:1}}>CANCEL</Text>
-                  </View>
-                </TouchableHighlight>
-              </View>
+              </TouchableHighlight>
             </View>
-          </View>
+          </TouchableHighlight>
         </Modal>
       </View>
     )
@@ -247,42 +295,135 @@ class MainScreen extends React.Component {
     })
   }
   _onPressConfig() {
-    const {ssid,password} = this.state
-    if (ssid != '' && password !='') {
-      Smartconfig.start({
-        type: 'esptouch', //or airkiss, now doesn't not effect
-        ssid: ssid,
-        bssid: 'filter-device', //"" if not need to filter (don't use null)
-        password: password,
-        timeout: 50000 //now doesn't not effect
-      }).then(function(results){
-        //Array of device success do smartconfig
-        console.log(results);
-        alert(JSON.stringify(results))
-        /*[
-          {
-            'bssid': 'device-bssi1', //device bssid
-            'ipv4': '192.168.1.11' //local ip address
-          },
-          {
-            'bssid': 'device-bssi2', //device bssid
-            'ipv4': '192.168.1.12' //local ip address
-          },
-          ...
-        ]*/
-      }).catch(function(error) {
-        alert('CANNOT CONFIG THIS DEVICE')
-      });
+    const {ssid,password,nameDevice} = this.state
+    if (ssid != '' && password !='' && nameDevice != '') {
+    //   Smartconfig.start({
+    //     type: 'esptouch', //or airkiss, now doesn't not effect
+    //     ssid: ssid,
+    //     bssid: 'filter-device', //"" if not need to filter (don't use null)
+    //     password: password,
+    //     timeout: 50000 //now doesn't not effect
+    //   }).then(function(results){
+    //     //Array of device success do smartconfig
+    //     console.log(results);
+    //     alert(JSON.stringify(results))
+    //     /*[
+    //       {
+    //         'bssid': 'device-bssi1', //device bssid
+    //         'ipv4': '192.168.1.11' //local ip address
+    //       },
+    //       {
+    //         'bssid': 'device-bssi2', //device bssid
+    //         'ipv4': '192.168.1.12' //local ip address
+    //       },
+    //       ...
+    //     ]*/
+    //   }).catch(function(error) {
+    //     alert('CANNOT CONFIG THIS DEVICE')
+    //   });
+      this._saveDeviceToStorage(ssid,nameDevice)
     } else {
-        alert('PLEASE CHECK YOUR SSID OR PASSWORD!')
+        alert('PLEASE CHECK YOUR SSID OR PASSWORD,NAME DEVICE!')
+    }
+  }
+  async _saveDeviceToStorage(macid,deviceName) {
+    try {
+      const value = await AsyncStorage.getItem('devices');
+      if (value !== null){
+        var convertedJson = JSON.parse(value)
+        var subJson = {macid:macid,nameDevice:deviceName}
+        convertedJson.push(subJson)
+        alert(JSON.stringify(convertedJson))
+        try {
+          await AsyncStorage.setItem('devices', JSON.stringify(convertedJson));
+        } catch (error) {
+          // Error saving data
+        }
+      } else {
+        var createJson = []
+        var subJson = {'macid':macid,'nameDevice':deviceName}
+        createJson.push(subJson)
+        try {
+          await AsyncStorage.setItem('devices', JSON.stringify(createJson));
+        } catch (error) {
+          // Error saving data
+        }
+        this._getDataListDeviceParent()
+      }
+    } catch (error) {
+      var createJson = []
+      var subJson = {'macid':macid,'nameDevice':deviceName}
+      createJson.push(subJson)
+      try {
+        await AsyncStorage.setItem('devices', createJson.toString());
+      } catch (error) {
+        // Error saving data
+      }
+      this._getDataListDeviceParent()
     }
   }
   _onPressCancelConfig() {
     this.setState({
       modalVisible:false,
       ssid:'',
-      password:''
+      passwifi:'',
+      nameDevice:''
     })
+  }
+  _onPressCancelListDevice() {
+    this.setState({modalVisible2:false})
+  }
+  _onPressListDevice() {
+    this.setState({modalVisible2:true})
+    this._getDataListDeviceParent()
+  }
+  _onPressChooseParentDevice(item) {
+    this.setState({selectedDevice:item.nameDevice})
+  }
+  _renderItemDevice(index,item) {
+    const height =Dimensions.get('window').height
+    const width = Dimensions.get('window').width
+    const color = index%2==0?'white':'rgba(0,0,0,0.05)'
+    return(
+      <View>
+        <TouchableHighlight onPress={this._onPressChooseParentDevice.bind(this,item)}>
+          <View style={{height:30,backgroundColor:color
+            ,justifyContent:'center',alignItems:'center'
+            ,width:width/2,padding:10}}>
+            <Text style={{flex:1,textAlign:'center',fontSize:8,
+              backgroundColor:'transparent'}}>{item.nameDevice}</Text>
+          </View>
+        </TouchableHighlight>
+      </View>
+    )
+  }
+  _renderListDevice() {
+    const width = Dimensions.get('window').width
+    const height =Dimensions.get('window').height
+    const {listDevice} = this.state
+    return (
+      <View style = {{flex:1,position:'absolute'}}>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={this.state.modalVisible2}
+          onRequestClose={() => {alert("Modal has been closed.")}}>
+          <TouchableHighlight onPress={this._onPressCancelListDevice.bind(this)} style={{flex:1}}>
+            <View style={{
+              flex:1,backgroundColor:'rgba(0,0,0,0.3)',alignItems:'center',
+            justifyContent:'center'}}>
+              <View style={{backgroundColor:'white',height:height/3,width:width/2}}>
+                <FlatList
+                  data={listDevice}
+                  keyExtractor= {(x,i) => i}
+                  renderItem={({index,item})=>this._renderItemDevice(index,item)}
+                  />
+              </View>
+            </View>
+          </TouchableHighlight>
+        </Modal>
+      </View>
+    )
   }
   render() {
     const width = Dimensions.get('window').width
@@ -304,11 +445,11 @@ class MainScreen extends React.Component {
                 </TouchableHighlight>
               </View>
               <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
-                <TouchableHighlight style={{height:null,width:null}} onPress={this._onPressDevice.bind(this)}>
+                <TouchableHighlight underlayColor='transparent' onPress={this._onPressListDevice.bind(this)}>
                   <View style={{flex:1,justifyContent:'center',alignItems:'center',flexDirection:'row'}}>
                     <View style={{justifyContent:'center',alignItems:'center'}}>
-                      <Text style={{fontSize:15,fontWeight:'bold',backgroundColor:'transparent'}}>KitChen</Text>
-                      <Text style={{fontSize:10,color:'rgba(0,0,0,0.2)',fontWeight:'normal',backgroundColor:'transparent'}}>Oven</Text>
+                      <Text style={{fontSize:15,fontWeight:'bold',backgroundColor:'transparent'}}>{this.state.selectedDevice}</Text>
+                      <Text style={{fontSize:10,color:'rgba(0,0,0,0.2)',fontWeight:'normal',backgroundColor:'transparent'}}>{this.state.selectedDevice}</Text>
                     </View>
                     <Image style={{left:5,width:10,height:10}} source={require('./icon/regtangle.png')}/>
                   </View>
@@ -384,6 +525,7 @@ class MainScreen extends React.Component {
         </LinearGradient>
 
         {this._renderConfigScreen()}
+        {this._renderListDevice()}
       </View>
     );
   }

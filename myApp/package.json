@@ -22,6 +22,7 @@
     "react-native-linear-gradient": "^2.3.0",
     "react-native-mqtt": "0.1.0-beta4",
     "react-native-paho-mqtt": "^0.1.1",
+    "react-native-smartconfig": "^0.2.2",
     "react-navigation": "^1.0.0-beta.15"
   }
 }

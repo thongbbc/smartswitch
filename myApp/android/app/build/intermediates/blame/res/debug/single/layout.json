@@ -4,12 +4,12 @@
         "source": "/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/layout/select_dialog_multichoice_material.xml"
     },
     {
-        "merged": "/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/res/merged/debug/layout/abc_list_menu_item_layout.xml",
-        "source": "/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/layout/abc_list_menu_item_layout.xml"
-    },
-    {
         "merged": "/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/res/merged/debug/layout/abc_list_menu_item_checkbox.xml",
         "source": "/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/layout/abc_list_menu_item_checkbox.xml"
+    },
+    {
+        "merged": "/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/res/merged/debug/layout/abc_list_menu_item_layout.xml",
+        "source": "/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/res/layout/abc_list_menu_item_layout.xml"
     },
     {
         "merged": "/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/res/merged/debug/layout/abc_activity_chooser_view_list_item.xml",

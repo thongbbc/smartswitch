@@ -39,6 +39,15 @@
     </item>
     <item
         is-multidex="false"
+        jar="/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/exploded-aar/myApp/react-native-smartconfig/unspecified/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="5a199969435fbb523a34a9d39a9aea83330656f2">
+        <dex dex="/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/pre-dexed/debug/myApp-react-native-smartconfig-unspecified_bde0096124a3cffd52f2502608518379072e9dd1.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/exploded-aar/com.facebook.fresco/drawee/1.3.0/jars/classes.jar"
         jumboMode="false"
         optimize="true"

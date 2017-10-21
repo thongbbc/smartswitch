@@ -3,6 +3,11 @@ import { StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,I
 import LinearGradient from 'react-native-linear-gradient';
 import {StackNavigator,DrawerNavigator} from 'react-navigation'
 import { Client, Message } from 'react-native-paho-mqtt';
+import Smartconfig from 'react-native-smartconfig';
+
+
+
+
 
 //Set up an in-memory alternative to global localStorage
 const myStorage = {
@@ -168,6 +173,38 @@ class MainScreen extends React.Component {
         colorStateButton:'red'
       })
     }
+
+    Smartconfig.start({
+      type: 'esptouch', //or airkiss, now doesn't not effect
+      ssid: 'BLACK',
+      bssid: 'filter-device', //"" if not need to filter (don't use null)
+      password: 'yoursolution',
+      timeout: 50000 //now doesn't not effect
+    }).then(function(results){
+      //Array of device success do smartconfig
+      console.log(results);
+      alert(JSON.stringify(results))
+      /*[
+        {
+          'bssid': 'device-bssi1', //device bssid
+          'ipv4': '192.168.1.11' //local ip address
+        },
+        {
+          'bssid': 'device-bssi2', //device bssid
+          'ipv4': '192.168.1.12' //local ip address
+        },
+        ...
+      ]*/
+    }).catch(function(error) {
+
+    });
+
+
+
+
+
+
+
   }
   render() {
     const width = Dimensions.get('window').width

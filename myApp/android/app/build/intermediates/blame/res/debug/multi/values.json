@@ -3357,11 +3357,11 @@
                 "from": {
                     "file": "/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/src/main/res/values/strings.xml",
                     "position": {
-                        "startLine": 1,
+                        "startLine": 2,
                         "startColumn": 4,
-                        "startOffset": 16,
+                        "startOffset": 17,
                         "endColumn": 48,
-                        "endOffset": 60
+                        "endOffset": 61
                     }
                 }
             },

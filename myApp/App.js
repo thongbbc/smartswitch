@@ -1,5 +1,5 @@
 import React from 'react';
-import {AsyncStorage,TextInput,Button,Platform,Modal, StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image } from 'react-native';
+import {AsyncStorage,TextInput,Button,Platform,Modal, StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image,Keyboard } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {StackNavigator,DrawerNavigator} from 'react-navigation'
 import { Client, Message } from 'react-native-paho-mqtt';
@@ -171,7 +171,7 @@ class MainScreen extends React.Component {
     const {dataSource} = this.state
     dataSource.map((value,index2) =>{
       if (index2 == index ){
-        value.check='white'
+        value.check='rgba(0,0,0,0.5)'
         dulieu.push(value)
       } else {
         value.check='transparent'
@@ -189,7 +189,7 @@ class MainScreen extends React.Component {
           <View style={{height:height/9 - 5,backgroundColor:item.check
             ,justifyContent:'center',alignItems:'center',borderRadius:5
             ,width:width/5,padding:10}}>
-            <Text style={{fontSize:8,backgroundColor:'transparent'}}>{item.name}</Text>
+            <Text style={{fontSize:8,color:'white',backgroundColor:'transparent'}}>{item.name}</Text>
           </View>
         </TouchableHighlight>
       </View>
@@ -271,14 +271,13 @@ class MainScreen extends React.Component {
             <View style={{
               flex:1,backgroundColor:'rgba(0,0,0,0.3)',alignItems:'center',
             justifyContent:'center'}}>
-              <TouchableHighlight underlayColor='rgba(0,0,0,0)'>
-              <View style={{padding:10,borderRadius:5,borderWidth:1,
-                  borderColor:'rgba(0,0,0,0.5)',
+              <TouchableHighlight underlayColor='rgba(0,0,0,0)' onPress = {()=>Keyboard.dismiss()}>
+              <View style={{padding:10,borderRadius:10,
                   height:height/2+height/10,width:width/2+width/5,
                   backgroundColor:'white'}}>
                 <Text style={{backgroundColor:'green',width:width/2+width/5-20,
                 textAlign:'center',padding:5,
-                fontWeight:'800',fontSize:20,color:'white'}}>Setting</Text>
+                fontWeight:'800',fontSize:20,color:'white'}}>Cài Đặt</Text>
                 <View style={{marginBottom:20,width:width/2+width/5-20
                   ,marginTop:20,flex:1,alignItems:'center'}}>
                   <Image style={{flex:1}} resizeMode='contain' source={require('./icon/setting.png')}/>
@@ -310,13 +309,13 @@ class MainScreen extends React.Component {
                     onPress={this._onPressConfig.bind(this)}>
                     <View style={{backgroundColor:'white',
                       width:(width/2 + width/5)/2-10,height:35,padding:5}}>
-                      <Text style={{color:'#1169f7',textAlign:'center',flex:1}}>ACCEPT</Text>
+                      <Text style={{fontWeight:'bold',color:'#1169f7',textAlign:'center',flex:1}}>Đồng Ý</Text>
                     </View>
                   </TouchableHighlight>
                   <TouchableHighlight onPress={this._onPressCancelConfig.bind(this)}>
                     <View style={{backgroundColor:'white',
                       width:(width/2 + width/5)/2-10,height:35,padding:5}}>
-                      <Text style={{color:'red',textAlign:'center',flex:1}}>CANCEL</Text>
+                      <Text style={{fontWeight:'bold',color:'red',textAlign:'center',flex:1}}>Hủy</Text>
                     </View>
                   </TouchableHighlight>
                 </View>
@@ -408,6 +407,7 @@ class MainScreen extends React.Component {
       passwifi:'',
       nameDevice:''
     })
+    Keyboard.dismiss()
   }
   _onPressCancelListDevice() {
     this.setState({modalVisible2:false})
@@ -440,15 +440,15 @@ class MainScreen extends React.Component {
   _renderItemDevice(index,item) {
     const height =Dimensions.get('window').height
     const width = Dimensions.get('window').width
-    const color = index%2==0?'white':'rgba(0,0,0,0.05)'
+    const color = index%2==0?'transparent':'transparent'
     return(
       <View>
         <TouchableHighlight onPress={this._onPressChooseParentDevice.bind(this,item)}>
-          <View style={{height:30,backgroundColor:color
+          <View style={{height:50,backgroundColor:color
             ,justifyContent:'center',alignItems:'center'
-            ,width:width/2,padding:10}}>
-            <Text style={{flex:1,textAlign:'center',fontSize:8,
-              backgroundColor:'transparent'}}>{item.nameDevice}</Text>
+            ,width:width/2+width/4,padding:10}}>
+            <Text style={{flex:1,textAlign:'center',fontSize:17,
+              backgroundColor:'transparent',color:'white'}}>{item.nameDevice}</Text>
           </View>
         </TouchableHighlight>
       </View>
@@ -470,8 +470,8 @@ class MainScreen extends React.Component {
               flex:1,backgroundColor:'rgba(0,0,0,0.3)',alignItems:'center',
             justifyContent:'center'}}>
             <TouchableHighlight underlayColor='rgba(0,0,0,0)'>
-              <View style={{backgroundColor:'white',height:height/3,width:width/2}}>
-                <FlatList
+              <View style={{borderRadius:10,backgroundColor:'rgba(255,255,255,0.5)',height:height/2,width:width/2+width/4}}>
+                <FlatList style={{backgroundColor:'rgba(0,0,0,0.8)',borderRadius:10,width:width/2+width/4,height:height/2}}
                   data={listDevice}
                   keyExtractor= {(x,i) => i}
                   renderItem={({index,item})=>this._renderItemDevice(index,item)}
@@ -509,8 +509,8 @@ class MainScreen extends React.Component {
                 <TouchableHighlight style={Platform.OS=='ios'?styles.height1:styles.height2} underlayColor='transparent' onPress={this._onPressListDevice.bind(this)}>
                   <View style={{flex:1,justifyContent:'center',alignItems:'center',flexDirection:'row'}}>
                     <View style={{justifyContent:'center',alignItems:'center'}}>
-                      <Text style={{fontSize:15,fontWeight:'bold',backgroundColor:'transparent'}}>{this.state.selectedDevice}</Text>
-                      <Text style={{fontSize:10,color:'rgba(0,0,0,0.2)',fontWeight:'normal',backgroundColor:'transparent'}}>{this.state.selectedDevice}</Text>
+                      <Text style={{fontSize:15,fontWeight:'bold',color:'white',backgroundColor:'transparent'}}>{this.state.selectedDevice}</Text>
+                      <Text style={{fontSize:10,color:'rgba(255,255,255,0.8)',fontWeight:'normal',backgroundColor:'transparent'}}>{this.state.selectedDevice}</Text>
                     </View>
                     <Image style={{left:5,width:10,height:10}} source={require('./icon/regtangle.png')}/>
                   </View>
@@ -527,10 +527,10 @@ class MainScreen extends React.Component {
           </View>
 
           <View style={{paddingTop:70,paddingBottom:70,flex:1,justifyContent:'center',alignItems:'center'}}>
-            <View style={{height:width/5*4-10,width:width/5*4-10,backgroundColor:'rgba(0,0,0,0)',borderWidth:1,borderColor:'rgba(0,0,0,0.05)',
+            <View style={{height:width/5*4-10,width:width/5*4-10,backgroundColor:'rgba(0,0,0,0)',borderWidth:1,borderColor:'rgba(0,0,0,0.07)',
               borderRadius:width/5*4-10/2,alignItems:'center',justifyContent:'center'
             }}>
-              <View style={{height:width/5*4-50,width:width/5*4-50,backgroundColor:'rgba(255,255,255,0.5)',borderWidth:1,borderColor:'rgba(0,0,0,0.05)',
+              <View style={{height:width/5*4-50,width:width/5*4-50,backgroundColor:'rgba(255,255,255,0.5)',borderWidth:1,borderColor:'rgba(0,0,0,0.03)',
                 borderRadius:width/5*4-50/2,alignItems:'center',justifyContent:'center'
               }}>
                 <Animated.View style={{height:width/5*4-50,width:width/5*4-50,backgroundColor:colorStateButton,borderWidth:1,borderColor:'rgba(0,0,0,0.08)',
@@ -551,7 +551,7 @@ class MainScreen extends React.Component {
                           <LinearGradient colors={['#fdfbfb','#ebedee']} style={{borderWidth:0,width:width/5*4 - 110,height:width/5*4 - 110
                               ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
                           }}>
-                          <View style={{backgroundColor:'white',width:width/5*4 - 110,height:width/5*4 - 110
+                          <View style={{width:width/5*4 - 110,height:width/5*4 - 110
                               ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
                           }}>
                             <Text style={{fontSize:40,backgroundColor:'transparent',color:colorStateButton}}>{stateButton==true?'ON':'OFF'}</Text>
@@ -561,7 +561,7 @@ class MainScreen extends React.Component {
                           <View style={{borderColor:'white',width:width/5*4 - 110,height:width/5*4 - 110
                               ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
                           }}>
-                          <View style={{backgroundColor:'white',width:width/5*4 - 110,height:width/5*4 - 110
+                          <View style={{width:width/5*4 - 110,height:width/5*4 - 110
                               ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
                           }}>
                             <Text style={{fontSize:40,backgroundColor:'transparent',color:colorStateButton}}>{stateButton==true?'ON':'OFF'}</Text>

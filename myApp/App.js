@@ -1,5 +1,5 @@
 import React from 'react';
-import {AsyncStorage,TextInput,Button,Modal, StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image } from 'react-native';
+import {AsyncStorage,TextInput,Button,Platform,Modal, StyleSheet, Text,TouchableHighlight,Animated,FlatList,View,Dimensions,Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {StackNavigator,DrawerNavigator} from 'react-navigation'
 import { Client, Message } from 'react-native-paho-mqtt';
@@ -20,37 +20,7 @@ const myStorage = {
   },
 };
 
-// Create a client instance
-const client = new Client({ uri: 'ws://iot.eclipse.org:80/ws', clientId: 'clientId', storage: myStorage });
 
-// set event handlers
-client.on('connectionLost', (responseObject) => {
-  if (responseObject.errorCode !== 0) {
-    console.log(responseObject.errorMessage);
-  }
-});
-client.on('messageReceived', (message) => {
-  console.log(message.payloadString);
-});
-
-// connect the client
-client.connect()
-  .then(() => {
-    // Once a connection has been made, make a subscription and send a message.
-    console.log('onConnect');
-    return client.subscribe('/data');
-  })
-  .then(() => {
-    const message = new Message('Hello');
-    message.destinationName = '/data';
-    client.send(message);
-  })
-  .catch((responseObject) => {
-    if (responseObject.errorCode !== 0) {
-      console.log('onConnectionLost:' + responseObject.errorMessage);
-    }
-  })
-;
 
 
 
@@ -69,7 +39,7 @@ class MyNotificationsScreen extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={{flex:1}}>
       <Button
         onPress={() => this.props.navigation.goBack()}
         title="Go back home"
@@ -101,7 +71,7 @@ class MainScreen extends React.Component {
       dataSource:[
         {name:'thong',check:'white'},
         {name:'thong',check:'transparent'},
-        {name:'thon',check:'transparent'}
+        {name:'thong',check:'transparent'}
       ],
       modalVisible:false,
       ssid:'',
@@ -114,7 +84,33 @@ class MainScreen extends React.Component {
       selectedDevice:'NULL',
       modalVisible2:false
     }
-    this._getDataWhenStartApp()
+    this.client = new Client({ uri: 'ws://iot.eclipse.org:80/ws', clientId: 'clientId', storage: myStorage });
+    this.client.on('connectionLost', (responseObject) => {
+      if (responseObject.errorCode !== 0) {
+        console.log(responseObject.errorMessage);
+      }
+    });
+    this.client.on('messageReceived', (message) => {
+      console.log(message.payloadString);
+      const json = JSON.parse(message.payloadString)
+      if(json.FUNC != 'Error'){
+        if (json.FUNC == 'Data') {
+          if (json.DATA == 'On') {
+            this.setState({stateButton:true,colorStateButton:'rgb(69, 237, 18)'})
+          } else {
+            this.setState({stateButton:false,  colorStateButton:'red'})
+          }
+        } else if(json.FUNC == 'Ctrl') {
+          if (json.DATA == 'On') {
+            this.setState({stateButton:true,colorStateButton:'rgb(69, 237, 18)'})
+          } else {
+            this.setState({stateButton:false,  colorStateButton:'red'})
+          }
+        }
+      } else {
+        alert("ERROR CAN NOT CONTROL")
+      }
+    });
   }
   async _getDataWhenStartApp() {
     try {
@@ -126,6 +122,31 @@ class MainScreen extends React.Component {
           listDevice:convertedJson,
           selectedDevice:convertedJson[0].nameDevice
         })
+        // connect the client
+        const topic = 'ESP'+convertedJson[0].macid+'/'
+        this.client.connect()
+          .then(() => {
+            console.log('onConnect');
+            const send = topic + 'slave'
+            return this.client.subscribe(send);
+          })
+          .then(() => {
+            const jsonUpdateState={ID:'ESP'+convertedJson[0].macid,
+              FUNC:"Data",ADDR:"1",DATA:"OFF"}
+            const message = new Message(JSON.stringify(jsonUpdateState));
+            message.destinationName = topic+'master';
+            this.client.send(message);
+          })
+          .catch((responseObject) => {
+            if (responseObject.errorCode !== 0) {
+              console.log('onConnectionLost:' + responseObject.errorMessage);
+            }
+          });
+      } else {
+        this.client.connect()
+          .then(() => {
+            console.log('onConnect');
+          })
       }
     } catch (error) {
       alert("STORAGE ERROR")
@@ -193,29 +214,47 @@ class MainScreen extends React.Component {
         Animated.parallel([
           Animated.timing(animated2,{
             toValue:1,
-            duration:4000
+            duration:5000
           }),
           Animated.timing(opacityB,{
             toValue:0,
-            duration:4000
+            duration:5000
           })
         ])
       )
     ]).start()
+    this._getDataWhenStartApp()
+
+
+
+
   }
   _onPressClickItem() {
-    this.setState({
-      stateButton:!this.state.stateButton
-    })
-    if (this.state.stateButton== true) {
-      this.setState({
-        colorStateButton:'rgb(69, 237, 18)'
-      })
+    // this.setState({
+    //   stateButton:!this.state.stateButton
+    // })
+    // if (this.state.stateButton== true) {
+    //   this.setState({
+    //     colorStateButton:'rgb(69, 237, 18)'
+    //   })
+    // } else {
+    //   this.setState({
+    //     colorStateButton:'red'
+    //   })
+    // }
+    var state = 'Off'
+    const {stateButton,listDevice} = this.state
+    if (stateButton == true) {
+      state = 'Off'
     } else {
-      this.setState({
-        colorStateButton:'red'
-      })
+      state = 'On'
     }
+    const jsonUpdateState={ID:'ESP'+listDevice[0].macid,
+      FUNC:"Ctrl",ADDR:"1",DATA:state}
+    const message = new Message(JSON.stringify(jsonUpdateState));
+    const topic = 'ESP'+listDevice[0].macid+'/'
+    message.destinationName = topic+'master';
+    this.client.send(message);
   }
   _renderConfigScreen() {
     const width = Dimensions.get('window').width
@@ -378,7 +417,25 @@ class MainScreen extends React.Component {
     this._getDataListDeviceParent()
   }
   _onPressChooseParentDevice(item) {
+    const {listDevice,selectedDevice} = this.state
     this.setState({selectedDevice:item.nameDevice})
+    listDevice.map((value)=>{
+      if (value.nameDevice == selectedDevice ) {
+        var topic = 'ESP'+value.macid+'/'
+        var topic2 = 'ESP'+item.macid+'/'
+        const send = topic + 'slave'
+        const sub = topic2+'slave'
+        this.client.unsubscribe(send)
+        this.client.subscribe(sub)
+
+        const jsonUpdateState={ID:'ESP'+item.macid,
+          FUNC:"Data",ADDR:"1",DATA:"OFF"}
+        const message = new Message(JSON.stringify(jsonUpdateState));
+        message.destinationName = topic2+'master';
+        this.client.send(message);
+      }
+    })
+    this._onPressCancelListDevice()
   }
   _renderItemDevice(index,item) {
     const height =Dimensions.get('window').height
@@ -408,10 +465,11 @@ class MainScreen extends React.Component {
           transparent={true}
           visible={this.state.modalVisible2}
           onRequestClose={() => {alert("Modal has been closed.")}}>
-          <TouchableHighlight onPress={this._onPressCancelListDevice.bind(this)} style={{flex:1}}>
+          <TouchableHighlight underlayColor='rgba(0,0,0,0)' onPress={this._onPressCancelListDevice.bind(this)} style={{flex:1}}>
             <View style={{
               flex:1,backgroundColor:'rgba(0,0,0,0.3)',alignItems:'center',
             justifyContent:'center'}}>
+            <TouchableHighlight underlayColor='rgba(0,0,0,0)'>
               <View style={{backgroundColor:'white',height:height/3,width:width/2}}>
                 <FlatList
                   data={listDevice}
@@ -419,6 +477,7 @@ class MainScreen extends React.Component {
                   renderItem={({index,item})=>this._renderItemDevice(index,item)}
                   />
               </View>
+            </TouchableHighlight>
             </View>
           </TouchableHighlight>
         </Modal>
@@ -431,21 +490,23 @@ class MainScreen extends React.Component {
     const {dataSource,animated,opacityA,animated2,opacityB,colorStateButton,stateButton} = this.state
     return (
       <View style={styles.container}>
-        <LinearGradient style={{
-            borderColor:'white',
+        <LinearGradient
+          colors={['#FC466B','#3F5EFB']}
+          style={{
+            borderWidth:0,
             width:Dimensions.get('window').width,
-            height:Dimensions.get('window').height}} colors={['#f5f7fa','#c3cfe2']}
+            height:Dimensions.get('window').height}}
             >
-          <View>
-            <View style={styles.statusBar} />
-            <View style={{flexDirection:'row',padding:10,justifyContent:'center'}}>
+          <View style={{marginBottom:30}}>
+            <View style={Platform.OS=='ios'?styles.statusBar:styles.statusBar2} />
+            <View style={{flexDirection:'row',height:null,padding:10,justifyContent:'center'}}>
               <View style={{justifyContent:'center'}}>
                 <TouchableHighlight onPress = {() => {this.props.navigation.navigate('DrawerToggle')}}>
                   <Image style={{height:20,width:20}} resizeMode='cover' source={require('./icon/drawer.png')}/>
                 </TouchableHighlight>
               </View>
               <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
-                <TouchableHighlight underlayColor='transparent' onPress={this._onPressListDevice.bind(this)}>
+                <TouchableHighlight style={Platform.OS=='ios'?styles.height1:styles.height2} underlayColor='transparent' onPress={this._onPressListDevice.bind(this)}>
                   <View style={{flex:1,justifyContent:'center',alignItems:'center',flexDirection:'row'}}>
                     <View style={{justifyContent:'center',alignItems:'center'}}>
                       <Text style={{fontSize:15,fontWeight:'bold',backgroundColor:'transparent'}}>{this.state.selectedDevice}</Text>
@@ -465,8 +526,7 @@ class MainScreen extends React.Component {
             </View>
           </View>
 
-
-          <View style={{marginBottom:70,marginTop:50,flex:1,justifyContent:'center',alignItems:'center'}}>
+          <View style={{paddingTop:70,paddingBottom:70,flex:1,justifyContent:'center',alignItems:'center'}}>
             <View style={{height:width/5*4-10,width:width/5*4-10,backgroundColor:'rgba(0,0,0,0)',borderWidth:1,borderColor:'rgba(0,0,0,0.05)',
               borderRadius:width/5*4-10/2,alignItems:'center',justifyContent:'center'
             }}>
@@ -481,28 +541,34 @@ class MainScreen extends React.Component {
                     }
                   ]
                 }}>
-                  <Animated.View style={{height:width/5*4-50,width:width/5*4-50,backgroundColor:'rgba(0,255,0,0.4)',borderWidth:1,borderColor:'rgba(0,0,0,0.08)',
-                    borderRadius:(width/5*4-50)/2,alignItems:'center',justifyContent:'center'
-                    ,opacity:opacityB,transform:[
-                      {
-                        scale:animated2
-                      }
-                    ]
-                  }}/>
                 </Animated.View>
-                <View style={{position:'absolute',alignItems:'center',justifyContent:'center',width:width/5*4 - 105,height:width/5*4 - 105,borderRadius:width/5*4 - 105/2,
+                <View style={{position:'absolute',alignItems:'center',justifyContent:'center',width:width/5*4 - 105,height:width/5*4 - 105,borderRadius:(width/5*4 - 105)/2,
                   backgroundColor:'rgba(0,0,0,0.05)'}}>
-                  <TouchableHighlight style={{borderRadius:width/5*4-110/2,height:null,width:null}} onPress={this._onPressClickItem.bind(this)}>
-                    <View style={{borderRadius:width/5*4-110/2}}>
-                      <LinearGradient colors={['#fdfbfb','#ebedee']} style={{borderColor:'white',width:width/5*4 - 110,height:width/5*4 - 110
-                          ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
-                      }}>
-                      <View style={{backgroundColor:'white',width:width/5*4 - 110,height:width/5*4 - 110
-                          ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
-                      }}>
-                        <Text style={{fontSize:40,backgroundColor:'transparent',color:colorStateButton}}>ON</Text>
-                      </View>
-                      </LinearGradient>
+                  <TouchableHighlight style={{borderRadius:width/5*4-110/2}} onPress={this._onPressClickItem.bind(this)}>
+                    <View style={{height:null,width:null,borderRadius:width/5*4-110/2}}>
+                      {
+                        Platform.OS == 'ios'?(
+                          <LinearGradient colors={['#fdfbfb','#ebedee']} style={{borderWidth:0,width:width/5*4 - 110,height:width/5*4 - 110
+                              ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
+                          }}>
+                          <View style={{backgroundColor:'white',width:width/5*4 - 110,height:width/5*4 - 110
+                              ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
+                          }}>
+                            <Text style={{fontSize:40,backgroundColor:'transparent',color:colorStateButton}}>{stateButton==true?'ON':'OFF'}</Text>
+                          </View>
+                          </LinearGradient>
+                        ):(
+                          <View style={{borderColor:'white',width:width/5*4 - 110,height:width/5*4 - 110
+                              ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
+                          }}>
+                          <View style={{backgroundColor:'white',width:width/5*4 - 110,height:width/5*4 - 110
+                              ,borderRadius:width/5*4-110/2,justifyContent:'center',alignItems:'center'
+                          }}>
+                            <Text style={{fontSize:40,backgroundColor:'transparent',color:colorStateButton}}>{stateButton==true?'ON':'OFF'}</Text>
+                          </View>
+                        </View>
+                        )
+                      }
                     </View>
                   </TouchableHighlight>
                 </View>
@@ -523,7 +589,6 @@ class MainScreen extends React.Component {
             </View>
           </View>
         </LinearGradient>
-
         {this._renderConfigScreen()}
         {this._renderListDevice()}
       </View>
@@ -556,5 +621,15 @@ const styles = StyleSheet.create({
   statusBar: {
     backgroundColor: "transparent",
     height: 40,
+  },
+  statusBar2: {
+    backgroundColor: "transparent",
+    height:20
+  },
+  height1:{
+
+  },
+  height2:{
+    height:30,width:50
   }
 });

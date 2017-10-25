@@ -7,7 +7,7 @@ import {
   Modal,
   KeyboardAvoidingView,
   StyleSheet,
-  Text,
+  Text,Easing,
   TouchableHighlight,
   Animated,
   FlatList,
@@ -46,7 +46,8 @@ export default class ManageDeviceScreen extends React.Component {
       dataSource: [],
       modalVisible: false,
       selectedDevice: '',
-      changeNameText: ''
+      changeNameText: '',
+      slideAnimation1:new Animated.Value(-300)
     }
   }
   componentDidMount() {
@@ -128,15 +129,23 @@ export default class ManageDeviceScreen extends React.Component {
   }
   _onPressCancelConfig() {
     Keyboard.dismiss()
-    this.setState({modalVisible: false})
+    Animated.timing(this.state.slideAnimation1,{
+        toValue:-1000,
+        duration:300
+      }).start(()=>this.setState({modalVisible: false}))
   }
   _onPressShowListDevice(index, item) {
     this.setState({modalVisible: true, selectedDevice: item})
+    this.state.slideAnimation1.setValue(-300)
+    Animated.timing(this.state.slideAnimation1,{
+        toValue:0,
+        duration:1000,easing:Easing.bounce
+      }).start()
   }
   render() {
     const width = Dimensions.get('window').width
     const height = Dimensions.get('window').height
-    const {dataSource, selectedDevice} = this.state
+    const {dataSource, selectedDevice,slideAnimation1} = this.state
     return (
       <View style={{
         flex: 1
@@ -213,6 +222,7 @@ export default class ManageDeviceScreen extends React.Component {
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
+                <Animated.View style={{marginTop:slideAnimation1}}>
                 <TouchableHighlight underlayColor='transparent' onPress={() => {
                   Keyboard.dismiss()
                 }}>
@@ -302,6 +312,7 @@ export default class ManageDeviceScreen extends React.Component {
                     </LinearGradient>
                   </View>
                 </TouchableHighlight>
+                </Animated.View>
               </TouchableHighlight>
             </Modal>
           </View>

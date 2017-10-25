@@ -8,6 +8,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.tuanpm.RCTSmartconfig.RCTSmartconfigPackage; // import for newest version of react-native
+import com.BV.LinearGradient.LinearGradientPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,8 +25,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-      new RCTSmartconfigPackage()           // for newest version of react-native
-
+      new RCTSmartconfigPackage(),           // for newest version of react-native
+     new LinearGradientPackage()
       );
     }
   };

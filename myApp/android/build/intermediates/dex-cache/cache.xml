@@ -21,6 +21,15 @@
     </item>
     <item
         is-multidex="false"
+        jar="/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/exploded-aar/myApp/react-native-linear-gradient/unspecified/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="b1de8f75805268154da5e88bb6195760b9d8966f">
+        <dex dex="/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/pre-dexed/debug/myApp-react-native-linear-gradient-unspecified_34ccb16c93f194c3f4eb62acc42bfaa68535709e.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/exploded-aar/com.facebook.fbui.textlayoutbuilder/textlayoutbuilder/1.0.0/jars/classes.jar"
         jumboMode="false"
         optimize="true"

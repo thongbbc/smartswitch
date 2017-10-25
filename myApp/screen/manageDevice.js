@@ -151,14 +151,12 @@ export default class ManageDeviceScreen extends React.Component {
             : styles.statusBar2}/>
           <View style={{
             flexDirection: 'row',
-            height: null,
-            padding: 10,
             justifyContent: 'center'
           }}>
             <View style={{
               justifyContent: 'center'
             }}>
-              <TouchableHighlight onPress= {() => {this.props.navigation.navigate('DrawerToggle')}}>
+              <TouchableHighlight underlayColor='transparent' style={{padding:10}} onPress= {() => {this.props.navigation.navigate('DrawerToggle')}}>
                 <Image style={{
                   height: 20,
                   width: 20
@@ -171,29 +169,21 @@ export default class ManageDeviceScreen extends React.Component {
               justifyContent: 'center',
               alignItems: 'center'
             }}>
-              <TouchableHighlight style={Platform.OS == 'ios'
-                ? styles.height1
-                : styles.height2} underlayColor='transparent'>
                 <View style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  flexDirection: 'column'
+                  flex: 1,alignItems:'center',justifyContent:'center'
                 }}>
-                  <View style={{
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}>
-                    <Text>Danh Sách Thiết Bị</Text>
+                  <View style={{flex:1,marginBottom:10}}>
+                    <Text >Danh Sách Thiết Bị</Text>
                   </View>
+                  <View style={{flex:1,marginBottom:10,marginTop:10}}>
                   <Image style={{
                     left: 5,
                     width: 10,
                     height: 10
                   }} source={require('../icon/regtangle.png')}/>
+                  </View>
                 </View>
-              </TouchableHighlight>
-            </View>
+             </View>
             <View style={{
               justifyContent: 'center',
               alignItems: 'flex-end'
@@ -232,7 +222,7 @@ export default class ManageDeviceScreen extends React.Component {
                     width: width / 2 + width / 6,
                     backgroundColor: 'white'
                   }}>
-                    <LinearGradient colors={['#fff']} style={{
+                    <LinearGradient colors={['#fff','#fff']} style={{
                       borderRadius: 10,
                       justifyContent: 'center',
                       alignItems: 'center',
@@ -338,7 +328,7 @@ const styles = StyleSheet.create({
   },
   statusBar2: {
     backgroundColor: "transparent",
-    height: 20
+    height: 10
   },
   height1: {},
   height2: {

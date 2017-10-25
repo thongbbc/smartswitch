@@ -43,6 +43,8 @@ class MainScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      slideAnimation1:new Animated.Value(-300),
+      slideAnimation2:new Animated.Value(-300),
       animated: new Animated.Value(0),
       opacityA: new Animated.Value(1),
       animated2: new Animated.Value(0),
@@ -620,7 +622,7 @@ class MainScreen extends React.Component {
                         backgroundColor: 'transparent'
                       }}>{this.state.selectedDevice}</Text>
                       <Text style={{
-                        fontSize: 10,
+                        fontSize: 8,
                         color: 'rgba(0,0,0,0.8)',
                         fontWeight: 'normal',
                         backgroundColor: 'transparent'
@@ -712,29 +714,31 @@ class MainScreen extends React.Component {
                   backgroundColor: 'rgba(0,0,0,0.05)'
                 }}>
                   <TouchableHighlight style={{
-                    borderRadius: width / 6 *4 - 80 / 2
+                    borderRadius: (width / 6 * 4 - 105) / 2,
+                    width: width / 6 *4 - 105,
+                    height: width / 6 *4 - 105,
                   }} onPress={this._onPressClickItem.bind(this)}>
                     <View style={{
-                      height: null,
-                      width: null,
-                      borderRadius: width / 6 *4 - 80 / 2
+                      width: width / 6 *4 - 105,
+                      height: width / 6 *4 - 105,
+                      borderRadius: width / 6 *4 - 105 / 2
                     }}>
                       {Platform.OS == 'ios'
                         ? (
                           <LinearGradient colors={['#fdfbfb', '#ebedee']} style={{
                             borderWidth: 0,
-                            width: width / 6 *4 - 80,
-                            height: width / 6 *4 - 80,
-                            borderRadius: width / 6 *4 - 80 / 2,
+                            width: width / 6 *4 - 105,
+                            height: width / 6 *4 - 105,
+                            borderRadius: width / 6 *4 - 105 / 2,
                             justifyContent: 'center',
                             alignItems: 'center'
                           }}>
                             <View style={{
                               borderWidth: 3,
                               borderColor: 'rgba(0,0,0,0.2)',
-                              width: width / 6 *4 - 80,
-                              height: width / 6 *4 - 80,
-                              borderRadius: width / 6 *4 - 80 / 2,
+                              width: width / 6 *4 - 105,
+                              height: width / 6 *4 - 105,
+                              borderRadius: width / 6 *4 - 105 / 2,
                               justifyContent: 'center',
                               alignItems: 'center'
                             }}>
@@ -749,13 +753,20 @@ class MainScreen extends React.Component {
                           </LinearGradient>
                         )
                         : (
-                          <View style={{
-                            borderColor: 'white',
-                            width: width / 6 *4 - 80,
-                            height: width / 6 *4 - 80,
-                            borderRadius: width / 6 *4 - 80 / 2,
+                          <LinearGradient colors={['#fdfbfb', '#ebedee']} style={{
+                            borderWidth: 3,borderColor: 'rgba(0,0,0,0.2)',
+                            width: width / 6 *4 - 105,
+                            height: width / 6 *4 - 105,
+                            borderRadius: width / 6 *4 - 105 / 2,
                             justifyContent: 'center',
                             alignItems: 'center'
+                          }}>
+                          <View style={{
+                            width: width / 6 *4 - 105,
+                            height: width / 6 *4 - 105,
+                            borderRadius: width / 6 *4 - 80 / 2,
+                            justifyContent: 'center',
+                            alignItems: 'center',
                           }}>
                             <View style={{
                               width: width / 6 *4 - 80,
@@ -773,6 +784,7 @@ class MainScreen extends React.Component {
                                   : 'OFF'}</Text>
                             </View>
                           </View>
+                        </LinearGradient>
                         )
 }
                     </View>
@@ -831,7 +843,6 @@ const styles = StyleSheet.create({
   },
   height1: {},
   height2: {
-    height: 30,
-    width: 50
+    flex:1
   }
 });

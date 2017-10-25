@@ -6,7 +6,7 @@ import {
   Platform,
   Modal,
   KeyboardAvoidingView,
-  StyleSheet,
+  StyleSheet,Easing,
   Text,
   TouchableHighlight,
   Animated,
@@ -44,7 +44,7 @@ class MainScreen extends React.Component {
     super(props)
     this.state = {
       slideAnimation1:new Animated.Value(-300),
-      slideAnimation2:new Animated.Value(-300),
+      slideAnimation2:new Animated.Value(0),
       animated: new Animated.Value(0),
       opacityA: new Animated.Value(1),
       animated2: new Animated.Value(0),
@@ -248,6 +248,7 @@ class MainScreen extends React.Component {
   _renderConfigScreen() {
     const width = Dimensions.get('window').width
     const height = Dimensions.get('window').height
+    const {slideAnimation1} = this.state
     return (
       <View style={{
         flex: 1,
@@ -265,6 +266,7 @@ class MainScreen extends React.Component {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
+            <Animated.View style={{marginTop:slideAnimation1}}>
               <KeyboardAvoidingView behavior={"position"} keyboardVerticalOffset={30}>
                 <TouchableHighlight underlayColor='rgba(0,0,0,0)' onPress= {()=>Keyboard.dismiss()}>
                   <View style={{
@@ -357,6 +359,7 @@ class MainScreen extends React.Component {
                   </View>
                 </TouchableHighlight>
               </KeyboardAvoidingView>
+            </Animated.View>
             </View>
           </TouchableHighlight>
         </Modal>
@@ -365,6 +368,11 @@ class MainScreen extends React.Component {
   }
   _onPressShowConfig() {
     this.setState({modalVisible: true})
+    this.state.slideAnimation1.setValue(-300)
+    Animated.timing(this.state.slideAnimation1,{
+        toValue:0,
+        duration:1000,easing:Easing.bounce
+      }).start()
   }
   _onPressConfig() {
     const {ssid, password, nameDevice} = this.state
@@ -444,15 +452,31 @@ class MainScreen extends React.Component {
     }
   }
   _onPressCancelConfig() {
-    this.setState({modalVisible: false, ssid: '', passwifi: '', nameDevice: ''})
     Keyboard.dismiss()
+    Animated.timing(this.state.slideAnimation1,{
+        toValue:-1000,
+        duration:300
+      }).start(() => {
+        this.setState({modalVisible: false, ssid: '', passwifi: '', nameDevice: ''})
+      })
   }
   _onPressCancelListDevice() {
-    this.setState({modalVisible2: false})
+    Animated.timing(this.state.slideAnimation2,{
+        toValue:-1000,
+        duration:300
+      }).start(() => {
+        this.setState({modalVisible2: false})
+      })
   }
   _onPressListDevice() {
-    this.setState({modalVisible2: true})
+    const height = Dimensions.get('window').height
     this._getDataListDeviceParent()
+    this.setState({modalVisible2: true})
+    this.state.slideAnimation2.setValue(0)
+    Animated.timing(this.state.slideAnimation2,{
+        toValue:(height - height / 2) / 2,
+        duration:1000,easing:Easing.bounce
+      }).start()
   }
   _onPressChooseParentDevice(item) {
     const {listDevice, selectedDevice} = this.state
@@ -512,7 +536,7 @@ class MainScreen extends React.Component {
   _renderListDevice() {
     const width = Dimensions.get('window').width
     const height = Dimensions.get('window').height
-    const {listDevice} = this.state
+    const {listDevice,slideAnimation2} = this.state
     return (
       <View style={{
         flex: 1,
@@ -531,9 +555,9 @@ class MainScreen extends React.Component {
               justifyContent: 'center'
             }}></View>
           </TouchableHighlight>
-          <View style={{
+          <Animated.View style={{
             position: 'absolute',
-            marginTop: (height - height / 2) / 2,
+            marginTop: slideAnimation2,
             marginLeft: (width - (width / 2 + width / 4)) / 2,
             borderRadius: 10,
             backgroundColor: 'rgba(255,255,255,1)',
@@ -546,10 +570,12 @@ class MainScreen extends React.Component {
               height: height / 2 -10- 50
             }} data={listDevice} keyExtractor= {(x,i) => i} renderItem={({index, item}) => this._renderItemDevice(index, item)}/>
           <View style={{width: width / 2 + width / 4,height:50,backgroundColor:'white',borderRadius:10}}>
-            <Button onPress = {this._onPressCancelListDevice.bind(this)} color='red' title='Thoát'/></View>
+            <Button onPress = {this._onPressCancelListDevice.bind(this)} color='red' title='Thoát'/>
+
           </View>
-        </Modal>
-      </View>
+        </Animated.View>
+      </Modal>
+    </View>
     )
   }
   render() {

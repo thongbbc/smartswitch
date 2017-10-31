@@ -1,0 +1,4 @@
+#Wed Nov 01 00:07:16 ICT 2017
+base.0=/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/transforms/dex/debug/folders/1000/1f/main
+renamed.0=classes.dex
+file.0=/Volumes/HDD/Job/smartswitch/smartswitch/myApp/android/app/build/intermediates/transforms/dex/debug/folders/1000/1f/main/classes.dex
